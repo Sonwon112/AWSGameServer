@@ -1,6 +1,7 @@
 ﻿using MatchServer;
 using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Utilities;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 
 class Program
@@ -10,7 +11,8 @@ class Program
     static void Main(string[] args)
     {
         connector.connectDB();
-        connector.selectDB();
+        TCPServer server = new TCPServer();
+        //connector.selectDB();
     }
 }
 
