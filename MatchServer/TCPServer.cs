@@ -18,7 +18,8 @@ namespace MatchServer
         private TcpListener server;
         private bool started = false;
         
-
+        List<Client> clientList = new List<Client>();
+        private int clientId = 1;
         public TCPServer()
         {
             server = new TcpListener(IPAddress.Any, 7777);
@@ -45,26 +46,16 @@ namespace MatchServer
                     Console.WriteLine($"클라이언트 접속: IP = {clientIP}, 포트 = {clientPort}");
 
                     NetworkStream stream = client.GetStream();
-                    DTO dto = new DTO(-1,"success");
+                    DTO dto = new DTO(-1,Type.CONNECT.ToString(),"success;"+(clientId));
                     String dataToJson = JsonSerializer.Serialize(dto);
                     Console.WriteLine(dataToJson);
                     byte[] buffer = Encoding.UTF8.GetBytes(dataToJson);
                     stream.Write(buffer, 0, buffer.Length);
+
+                    Client currConn = new Client(clientId++, stream);
+                    clientList.Add(currConn);
                 }
             }
         }
-    }
-}
-
-
-class DTO
-{
-    public int id { get; set; }
-    public string msg { get; set; }
-
-    public DTO(int  id, string msg)
-    {
-        this.id = id;
-        this.msg = msg;
     }
 }
