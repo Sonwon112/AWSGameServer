@@ -55,25 +55,31 @@ namespace MatchServer
                         switch (dtoType)
                         {
                             case Type.LOGIN:
-                                string[] data = dto.msg.Split(';');
-                                UserInfo user = connector.selectUserInfoByUserId(data[0]);
-                                if (user == null)
                                 {
-                                    Console.WriteLine("등록되지 않은 사용자 입니다.");
-                                    Send(Type.LOGIN, "fail;01");
-                                    continue;
+                                    string[] data = dto.msg.Split(';');
+                                    UserInfo user = connector.selectUserInfoByUserId(data[0]);
+                                    if (user == null)
+                                    {
+                                        Console.WriteLine("등록되지 않은 사용자 입니다.");
+                                        Send(Type.LOGIN, "fail;01");
+                                        continue;
+                                    }
+                                    if (!data[1].Equals(user.pwd))
+                                    {
+                                        Console.WriteLine("잘못된 비밀번호 입니다.");
+                                        Send(Type.LOGIN, "fail;02");
+                                        continue;
+                                    }
+                                    Console.WriteLine(data[0] + "님 로그인 성공");
+                                    Send(Type.LOGIN, "success;" + user.nickname);
+                                    break;
                                 }
-                                if (!data[1].Equals(user.pwd))
-                                {
-                                    Console.WriteLine("잘못된 비밀번호 입니다.");
-                                    Send(Type.LOGIN, "fail;02");
-                                    continue;
-                                }
-                                Console.WriteLine(data[0] + "님 로그인 성공");
-                                Send(Type.LOGIN, "success;" + user.nickname);
-                                break;
                             case Type.SIGNUP:
-                                break;
+                                {
+                                    string[] data = dto.msg.Split(';');
+
+                                    break;
+                                }
                             case Type.START:
                                 break;
                             case Type.END:
