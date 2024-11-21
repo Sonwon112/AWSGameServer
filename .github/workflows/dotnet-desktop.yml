@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 env:
-  DOCKER_IMAGE_NAME: MatchServer
+  DOCKER_IMAGE_NAME: match-server
   EC2_HOST: 100.27.28.197
   EC2_SSH_USER: ec2-user
   PRIVATE_KEY: ${{ secrets.EC2_KEY }}
