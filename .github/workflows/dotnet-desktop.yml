@@ -6,13 +6,17 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  DOCKER_IMAGE_NAME: MatchServer
+  EC2_HOST: 100.27.28.197
+  EC2_SSH_USER: ec2-user
+  PRIVATE_KEY: ${{ secrets.EC2_KEY }}
+  Solution_Name: MatchServer  # 솔루션 이름
+
 jobs:
-  build:
+  build-and-push-docker:
     runs-on: windows-latest
-
-    env:
-      Solution_Name: MatchServer  # 솔루션 이름
-
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -39,3 +43,35 @@ jobs:
       with:
         name: Console App
         path: ./publish
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{env.DOCKER_IMAGE_NAME}}:latest
+
+    - name: Login Docker Hub using tkn
+      run: echo "${{secrets.DOCKER_TOKEN}}" | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
+
+    - name: Push the Docker image
+      run: docker push ${{env.DOCKER_IMAGE_NAME}}:latest
+
+  deploy-to-ec2:
+
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_SSH_USER }}
+          key: ${{ env.PRIVATE_KEY }}
+          script: |
+            CONTAINER_ID=$(sudo docker ps -q --filter "publish=80-8080")
+
+            if [ ! -z "$CONTAINER_ID" ]; then
+              sudo docker stop $CONTAINER_ID
+              sudo docker rm $CONTAINER_ID
+            fi
+
+            sudo docker pull ${{ env.DOCKER_HUB }}
+            sudo docker run --name ${{ env.CONTAINER_NAME }} -d -p 80:8080 -e TZ=Asia/Seoul ${{ env.DOCKER_HUB }}
