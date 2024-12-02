@@ -8,8 +8,8 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: sonwonill/match-server
-  EC2_HOST: 100.27.28.197
-  EC2_SSH_USER: ec2-user
+  EC2_HOST: 52.70.174.90
+  EC2_SSH_USER: ubuntu
   PRIVATE_KEY: ${{ secrets.EC2_KEY }}
   CONTAINER_NAME: match-server-container
   Solution_Name: MatchServer  # 솔루션 이름
